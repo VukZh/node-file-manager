@@ -9,6 +9,7 @@ import eol from "./os/eol.js";
 import homedir from "./os/homedir.js";
 import architecture from "./os/architecture.js";
 import cpus from "./os/cpus.js";
+import hash from "./fs/hash.js";
 
 let currentDir = dirname(fileURLToPath(import.meta.url));
 
@@ -60,6 +61,9 @@ rl.on('line', async (commandTxt) => {
         const cpuItems = cpus();
         console.table(cpuItems, ['model', 'speed']);
         console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
+    }
+    if (commandTxt.startsWith("hash ")) {
+        await hash(commandTxt.split(' ')[1], currentDir)
     }
 });
 
