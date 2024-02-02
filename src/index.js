@@ -10,8 +10,9 @@ import homedir from "./os/homedir.js";
 import architecture from "./os/architecture.js";
 import cpus from "./os/cpus.js";
 import hash from "./fs/hash.js";
+import cd from "./fs/cd.js";
 
-let currentDir = dirname(fileURLToPath(import.meta.url));
+let currentDir = homedir();
 
 const rl = createInterface({
     input: stdin,
@@ -26,7 +27,7 @@ if (process.argv[2] && process.argv[2].startsWith("--username=")) {
     userName = "Noname";
 }
 console.log("\x1b[32m", `Welcome to the File Manager, ${userName}!`, "\x1b[0m")
-console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m" );
+console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
 
 rl.on('line', async (commandTxt) => {
     if (commandTxt === ".exit") {
@@ -64,6 +65,10 @@ rl.on('line', async (commandTxt) => {
     }
     if (commandTxt.startsWith("hash ")) {
         await hash(commandTxt.split(' ')[1], currentDir)
+    }
+    if (commandTxt.startsWith("cd ")) {
+        currentDir = cd(commandTxt.slice(2).trim(), currentDir);
+        console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
     }
 });
 
