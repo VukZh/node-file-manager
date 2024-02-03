@@ -4,7 +4,7 @@ import {createHash} from "crypto"
 import {createReadStream} from "fs"
 import {sep} from "path";
 
-const calculateHash = async (path, dir) => {
+const calculateHash = async (path, dir, cb) => {
 
     let encodedFile = "";
     if (path.includes(sep)) {
@@ -24,6 +24,7 @@ const calculateHash = async (path, dir) => {
             }
             const hashResult = encodedStream.read();
             console.log(hashResult);
+            cb();
         })
     } catch (error) {
         console.log(error)

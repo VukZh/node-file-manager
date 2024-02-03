@@ -1,7 +1,7 @@
 import {createInterface} from 'readline/promises';
 import {stdin, stdout} from 'process';
-import {fileURLToPath} from 'url';
 import {dirname} from "path";
+import {fileURLToPath} from 'url';
 
 import list from "./fs/currentDir.js";
 import username from "./os/username.js";
@@ -11,8 +11,14 @@ import architecture from "./os/architecture.js";
 import cpus from "./os/cpus.js";
 import hash from "./fs/hash.js";
 import cd from "./fs/cd.js";
+import cat from "./fs/cat.js";
 
-let currentDir = homedir();
+// let currentDir = homedir();
+let currentDir = dirname(fileURLToPath(import.meta.url));
+
+const currentDirPrint = (dir) => {
+    console.log("\x1b[90m", `You are currently in ${dir}`, "\x1b[0m");
+}
 
 const rl = createInterface({
     input: stdin,
@@ -27,7 +33,7 @@ if (process.argv[2] && process.argv[2].startsWith("--username=")) {
     userName = "Noname";
 }
 console.log("\x1b[32m", `Welcome to the File Manager, ${userName}!`, "\x1b[0m")
-console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
+currentDirPrint(currentDir);
 
 rl.on('line', async (commandTxt) => {
     if (commandTxt === ".exit") {
@@ -36,38 +42,41 @@ rl.on('line', async (commandTxt) => {
     if (commandTxt === "ls") {
         const dirItems = await list(currentDir);
         console.table(dirItems, ['Name', 'Type']);
-        console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
+        currentDirPrint(currentDir);
     }
     if (commandTxt === "up") {
         currentDir = dirname(currentDir);
-        console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
+        currentDirPrint(currentDir);
     }
     if (commandTxt === "os --username") {
         console.log(username());
-        console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
+        currentDirPrint(currentDir);
     }
     if (commandTxt === "os --EOL") {
         console.log(eol());
-        console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
+        currentDirPrint(currentDir);
     }
     if (commandTxt === "os --homedir") {
         console.log(homedir());
-        console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
+        currentDirPrint(currentDir);
     }
     if (commandTxt === "os --architecture") {
         console.log(architecture());
-        console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
+        currentDirPrint(currentDir);
     }
     if (commandTxt === "os --cpus") {
         const cpuItems = cpus();
         console.table(cpuItems, ['model', 'speed']);
-        console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
+        currentDirPrint(currentDir);
     }
     if (commandTxt.startsWith("hash ")) {
-        await hash(commandTxt.split(' ')[1], currentDir)
+        await hash(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
     }
     if (commandTxt.startsWith("cd ")) {
         currentDir = cd(commandTxt.slice(2).trim(), currentDir);
+        currentDirPrint(currentDir);    }
+    if (commandTxt.startsWith("cat ")) {
+        await cat(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
         console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
     }
 });
