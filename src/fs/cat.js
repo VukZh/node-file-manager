@@ -12,7 +12,6 @@ const cat = async (path, dir, cb) => {
         readFilePath = join(dir, path)
     }
 
-
     let capturedData = '';
 
     const readStream = createReadStream(readFilePath, { encoding: 'utf8' });

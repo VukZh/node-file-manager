@@ -12,6 +12,9 @@ import cpus from "./os/cpus.js";
 import hash from "./fs/hash.js";
 import cd from "./fs/cd.js";
 import cat from "./fs/cat.js";
+import del from "./fs/del.js";
+import rn from "./fs/rn.js";
+import cp from "./fs/cp.js";
 
 // let currentDir = homedir();
 let currentDir = dirname(fileURLToPath(import.meta.url));
@@ -77,7 +80,15 @@ rl.on('line', async (commandTxt) => {
         currentDirPrint(currentDir);    }
     if (commandTxt.startsWith("cat ")) {
         await cat(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
-        console.log("\x1b[90m", `You are currently in ${currentDir}`, "\x1b[0m");
+    }
+    if (commandTxt.startsWith("rm ")) {
+        await del(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+    }
+    if (commandTxt.startsWith("rn ")) {
+        await rn(commandTxt.split(' ')[1], commandTxt.split(' ')[2], currentDir, () => currentDirPrint(currentDir));
+    }
+    if (commandTxt.startsWith("cp ")) {
+        await cp(commandTxt.split(' ')[1], commandTxt.split(' ')[2], currentDir, () => currentDirPrint(currentDir));
     }
 });
 
