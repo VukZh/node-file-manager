@@ -16,6 +16,7 @@ import del from "./fs/del.js";
 import rn from "./fs/rn.js";
 import cp from "./fs/cp.js";
 import add from "./fs/add.js";
+import mv from "./fs/mv.js";
 
 // let currentDir = homedir();
 let currentDir = dirname(fileURLToPath(import.meta.url));
@@ -93,6 +94,9 @@ rl.on('line', async (commandTxt) => {
     }
     if (commandTxt.startsWith("add ")) {
         await add(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+    }
+    if (commandTxt.startsWith("mv ")) {
+        await mv(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
     }
 });
 
