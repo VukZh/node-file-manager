@@ -17,6 +17,8 @@ import rn from "./fs/rn.js";
 import cp from "./fs/cp.js";
 import add from "./fs/add.js";
 import mv from "./fs/mv.js";
+import compress from "./fs/compress.js";
+import decompress from "./fs/decompress.js";
 
 // let currentDir = homedir();
 let currentDir = dirname(fileURLToPath(import.meta.url));
@@ -79,7 +81,8 @@ rl.on('line', async (commandTxt) => {
     }
     if (commandTxt.startsWith("cd ")) {
         currentDir = cd(commandTxt.slice(2).trim(), currentDir);
-        currentDirPrint(currentDir);    }
+        currentDirPrint(currentDir);
+    }
     if (commandTxt.startsWith("cat ")) {
         await cat(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
     }
@@ -97,6 +100,12 @@ rl.on('line', async (commandTxt) => {
     }
     if (commandTxt.startsWith("mv ")) {
         await mv(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+    }
+    if (commandTxt.startsWith("compress ")) {
+        await compress(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+    }
+    if (commandTxt.startsWith("decompress ")) {
+        await decompress(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
     }
 });
 
