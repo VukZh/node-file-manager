@@ -1,7 +1,6 @@
 import {createInterface} from 'readline/promises';
 import {stdin, stdout} from 'process';
 import {dirname} from "path";
-import {fileURLToPath} from 'url';
 
 import list from "./fs/currentDir.js";
 import username from "./os/username.js";

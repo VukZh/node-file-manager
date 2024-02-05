@@ -2,7 +2,6 @@ import {join, sep} from "path";
 import {createReadStream, createWriteStream} from "fs"
 import {pipeline} from "stream"
 
-
 const cp = async (pathOld, pathNew, dir, cb) => {
 
     if (!pathOld || !pathNew) {

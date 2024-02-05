@@ -3,6 +3,7 @@ import {pipeline} from "stream"
 import {createReadStream} from "fs"
 import {sep} from "path";
 import {Writable} from "stream";
+
 const cat = async (path, dir, cb) => {
 
     if (!path) {
