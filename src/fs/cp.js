@@ -5,6 +5,10 @@ import {pipeline} from "stream"
 
 const cp = async (pathOld, pathNew, dir, cb) => {
 
+    if (!pathOld || !pathNew) {
+        throw new Error("Invalid input")
+    }
+
     return new Promise((res, rej) => {
         let oldFilePath = "";
         if (pathOld.includes(sep)) {

@@ -5,6 +5,10 @@ import {pipeline} from "stream"
 
 const mv = async (path, dir, newDir, cb) => {
 
+    if (!path || !newDir) {
+        throw new Error("Invalid input")
+    }
+
     return new Promise((res, rej) => {
         let oldFilePath = "";
         if (path.includes(sep)) {

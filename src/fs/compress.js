@@ -4,6 +4,11 @@ import {pipeline} from "stream"
 import zlib from "zlib"
 
 const compress = async (path, dir, newDir, cb) => {
+
+    if (!path || !newDir) {
+        throw new Error("Invalid input")
+    }
+
     return new Promise((res, rej) => {
         let oldFilePath = "";
         if (path.includes(sep)) {

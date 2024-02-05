@@ -5,6 +5,10 @@ import {sep} from "path";
 import {Writable} from "stream";
 const cat = async (path, dir, cb) => {
 
+    if (!path) {
+        throw new Error("Invalid input")
+    }
+
     return new Promise((res, rej) => {
         let readFilePath = "";
         if (path.includes(sep)) {

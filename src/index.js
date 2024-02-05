@@ -20,15 +20,33 @@ import mv from "./fs/mv.js";
 import compress from "./fs/compress.js";
 import decompress from "./fs/decompress.js";
 
-// let currentDir = homedir();
-let currentDir = dirname(fileURLToPath(import.meta.url));
+let currentDir = homedir();
 
 const currentDirPrint = (dir) => {
     console.log("\x1b[90m", `You are currently in ${dir}`, "\x1b[0m");
 }
 
-const operationFailedPrint = () => {
-    console.log("\x1b[91m", "Operation failed", "\x1b[0m");
+const errorPrint = (error) => {
+    if (error.message === "Invalid input") {
+        console.log("\x1b[33m", "Invalid input", "\x1b[0m");
+    } else {
+        console.log("\x1b[91m", "Operation failed", "\x1b[0m");
+    }
+}
+
+const inputSplitter = (input) => {
+    const regex = /"([^"]+)"|\S+/g;
+    const matches = input.match(regex) || [];
+    const splittedInput = [];
+
+    for (let match of matches) {
+        if (match.startsWith('"')) {
+            splittedInput.push(match.slice(1, -1));
+        } else {
+            splittedInput.push(match);
+        }
+    }
+    return splittedInput;
 }
 
 const rl = createInterface({
@@ -39,124 +57,108 @@ const rl = createInterface({
 
 let userName = "";
 if (process.argv[2] && process.argv[2].startsWith("--username=")) {
-    userName = process.argv[2].slice(11);
+    userName = process.argv[2].split('=')[1];
 } else {
-    userName = "Noname";
+    userName = "Unknown";
 }
 console.log("\x1b[32m", `Welcome to the File Manager, ${userName}!`, "\x1b[0m")
 currentDirPrint(currentDir);
 
 rl.on('line', async (commandTxt) => {
+    const splittedInput = inputSplitter(commandTxt);
     if (commandTxt === ".exit") {
         rl.close()
-    }
-    if (commandTxt === "ls") {
+    } else if (commandTxt === "ls") {
         try {
             const dirItems = await list(currentDir);
             console.table(dirItems, ['Name', 'Type']);
             currentDirPrint(currentDir);
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
-    }
-    if (commandTxt === "up") {
+    } else if (commandTxt === "up") {
         currentDir = dirname(currentDir);
         currentDirPrint(currentDir);
-    }
-    if (commandTxt === "os --username") {
+    } else if (commandTxt === "os --username") {
         console.log(username());
         currentDirPrint(currentDir);
-    }
-    if (commandTxt === "os --EOL") {
+    } else if (commandTxt === "os --EOL") {
         console.log(eol());
         currentDirPrint(currentDir);
-    }
-    if (commandTxt === "os --homedir") {
+    } else if (commandTxt === "os --homedir") {
         console.log(homedir());
         currentDirPrint(currentDir);
-    }
-    if (commandTxt === "os --architecture") {
+    } else if (commandTxt === "os --architecture") {
         console.log(architecture());
         currentDirPrint(currentDir);
-    }
-    if (commandTxt === "os --cpus") {
+    } else if (commandTxt === "os --cpus") {
         const cpuItems = cpus();
         console.table(cpuItems, ['model', 'speed']);
         currentDirPrint(currentDir);
-    }
-    if (commandTxt.startsWith("hash ")) {
+    } else if (commandTxt.startsWith("hash ")) {
         try {
-            await hash(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+            await hash(splittedInput[1], currentDir, () => currentDirPrint(currentDir));
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
-    }
-    if (commandTxt.startsWith("cd ")) {
+    } else if (commandTxt.startsWith("cd ")) {
         try {
-            currentDir = await cd(commandTxt.slice(2).trim(), currentDir);
+            currentDir = await cd(splittedInput[1], currentDir);
             currentDirPrint(currentDir);
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
-    }
-    if (commandTxt.startsWith("cat ")) {
+    } else if (commandTxt.startsWith("cat ")) {
         try {
-            await cat(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+            await cat(splittedInput[1], currentDir, () => currentDirPrint(currentDir));
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
-    }
-    if (commandTxt.startsWith("rm ")) {
+    } else if (commandTxt.startsWith("rm ")) {
         try {
-            await del(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+            await del(splittedInput[1], currentDir, () => currentDirPrint(currentDir));
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
 
-    }
-    if (commandTxt.startsWith("rn ")) {
+    } else if (commandTxt.startsWith("rn ")) {
         try {
-            await rn(commandTxt.split(' ')[1], commandTxt.split(' ')[2], currentDir, () => currentDirPrint(currentDir));
+            await rn(splittedInput[1], splittedInput[2], currentDir, () => currentDirPrint(currentDir));
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
-
-    }
-    if (commandTxt.startsWith("cp ")) {
+    } else if (commandTxt.startsWith("cp ")) {
         try {
-            await cp(commandTxt.split(' ')[1], commandTxt.split(' ')[2], currentDir, () => currentDirPrint(currentDir));
+            await cp(splittedInput[1], splittedInput[2], currentDir, () => currentDirPrint(currentDir));
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
-
-    }
-    if (commandTxt.startsWith("add ")) {
+    } else if (commandTxt.startsWith("add ")) {
         try {
-            await add(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+            await add(splittedInput[1], currentDir, () => currentDirPrint(currentDir));
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
-    }
-    if (commandTxt.startsWith("mv ")) {
+    } else if (commandTxt.startsWith("mv ")) {
         try {
-            await mv(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+            await mv(splittedInput[1], currentDir, splittedInput[2], () => currentDirPrint(currentDir));
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
-    }
-    if (commandTxt.startsWith("compress ")) {
+    } else if (commandTxt.startsWith("compress ")) {
         try {
-            await compress(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+            await compress(splittedInput[1], currentDir, splittedInput[2], () => currentDirPrint(currentDir));
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
-    }
-    if (commandTxt.startsWith("decompress ")) {
+    } else if (commandTxt.startsWith("decompress ")) {
         try {
-            await decompress(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+            await decompress(splittedInput[1], currentDir, splittedInput[2], () => currentDirPrint(currentDir));
         } catch (e) {
-            operationFailedPrint()
+            errorPrint(e)
         }
+    } else {
+        console.log("\x1b[33m", "Invalid input", "\x1b[0m");
     }
 });
 

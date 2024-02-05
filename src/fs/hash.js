@@ -6,6 +6,10 @@ import {sep} from "path";
 
 const calculateHash = async (path, dir, cb) => {
 
+    if (!path) {
+        throw new Error("Invalid input")
+    }
+
     return new Promise((res, rej) => {
         let encodedFile = "";
         if (path.includes(sep)) {

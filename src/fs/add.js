@@ -2,6 +2,11 @@ import {join, sep} from "path";
 import {writeFile, access} from "fs/promises";
 
 const add = async (path, dir, cb) => {
+
+    if (!path) {
+        throw new Error("Invalid input")
+    }
+
     let newFilePath = "";
     try {
         if (path.includes(sep)) {
