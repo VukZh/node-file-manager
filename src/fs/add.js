@@ -10,13 +10,13 @@ const add = async (path, dir, cb) => {
             newFilePath = join(dir, path)
         }
         await access(newFilePath);
-        throw new Error("FS operation failed")
+        throw new Error("file exists")
     } catch (error) {
         if (error.code === "ENOENT") {
             await writeFile(newFilePath, "");
             cb()
         } else {
-            throw error
+            throw new Error("add error")
         }
     }
 };

@@ -27,6 +27,10 @@ const currentDirPrint = (dir) => {
     console.log("\x1b[90m", `You are currently in ${dir}`, "\x1b[0m");
 }
 
+const operationFailedPrint = () => {
+    console.log("\x1b[91m", "Operation failed", "\x1b[0m");
+}
+
 const rl = createInterface({
     input: stdin,
     output: stdout
@@ -47,9 +51,13 @@ rl.on('line', async (commandTxt) => {
         rl.close()
     }
     if (commandTxt === "ls") {
-        const dirItems = await list(currentDir);
-        console.table(dirItems, ['Name', 'Type']);
-        currentDirPrint(currentDir);
+        try {
+            const dirItems = await list(currentDir);
+            console.table(dirItems, ['Name', 'Type']);
+            currentDirPrint(currentDir);
+        } catch (e) {
+            operationFailedPrint()
+        }
     }
     if (commandTxt === "up") {
         currentDir = dirname(currentDir);
@@ -77,35 +85,78 @@ rl.on('line', async (commandTxt) => {
         currentDirPrint(currentDir);
     }
     if (commandTxt.startsWith("hash ")) {
-        await hash(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+        try {
+            await hash(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+        } catch (e) {
+            operationFailedPrint()
+        }
     }
     if (commandTxt.startsWith("cd ")) {
-        currentDir = await cd(commandTxt.slice(2).trim(), currentDir);
-        currentDirPrint(currentDir);
+        try {
+            currentDir = await cd(commandTxt.slice(2).trim(), currentDir);
+            currentDirPrint(currentDir);
+        } catch (e) {
+            operationFailedPrint()
+        }
     }
     if (commandTxt.startsWith("cat ")) {
-        await cat(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+        try {
+            await cat(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+        } catch (e) {
+            operationFailedPrint()
+        }
     }
     if (commandTxt.startsWith("rm ")) {
-        await del(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+        try {
+            await del(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+        } catch (e) {
+            operationFailedPrint()
+        }
+
     }
     if (commandTxt.startsWith("rn ")) {
-        await rn(commandTxt.split(' ')[1], commandTxt.split(' ')[2], currentDir, () => currentDirPrint(currentDir));
+        try {
+            await rn(commandTxt.split(' ')[1], commandTxt.split(' ')[2], currentDir, () => currentDirPrint(currentDir));
+        } catch (e) {
+            operationFailedPrint()
+        }
+
     }
     if (commandTxt.startsWith("cp ")) {
-        await cp(commandTxt.split(' ')[1], commandTxt.split(' ')[2], currentDir, () => currentDirPrint(currentDir));
+        try {
+            await cp(commandTxt.split(' ')[1], commandTxt.split(' ')[2], currentDir, () => currentDirPrint(currentDir));
+        } catch (e) {
+            operationFailedPrint()
+        }
+
     }
     if (commandTxt.startsWith("add ")) {
-        await add(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+        try {
+            await add(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
+        } catch (e) {
+            operationFailedPrint()
+        }
     }
     if (commandTxt.startsWith("mv ")) {
-        await mv(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+        try {
+            await mv(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+        } catch (e) {
+            operationFailedPrint()
+        }
     }
     if (commandTxt.startsWith("compress ")) {
-        await compress(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+        try {
+            await compress(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+        } catch (e) {
+            operationFailedPrint()
+        }
     }
     if (commandTxt.startsWith("decompress ")) {
-        await decompress(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+        try {
+            await decompress(commandTxt.split(' ')[1], currentDir, commandTxt.split(' ')[2], () => currentDirPrint(currentDir));
+        } catch (e) {
+            operationFailedPrint()
+        }
     }
 });
 

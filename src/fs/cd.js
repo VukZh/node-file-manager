@@ -12,10 +12,10 @@ const cd = async (path, dir) => {
     }
     const nextDir = nextPath.endsWith(sep) ? nextPath : nextPath + sep;
     try {
-        const r = await access(nextDir);
+        await access(nextDir);
     } catch (err) {
         if (err.code === "ENOENT") {
-            throw new Error("Operation failed")
+            throw new Error("directory not exists")
         }
         return dir
     }

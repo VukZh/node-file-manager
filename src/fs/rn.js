@@ -5,32 +5,34 @@ import {pipeline} from "stream"
 
 const rn = async (pathOld, pathNew, dir, cb) => {
 
-    let oldFilePath = "";
-    if (pathOld.includes(sep)) {
-        oldFilePath = pathOld;
-    } else {
-        oldFilePath = join(dir, pathOld)
-    }
+    return new Promise((res, rej) => {
+        let oldFilePath = "";
+        if (pathOld.includes(sep)) {
+            oldFilePath = pathOld;
+        } else {
+            oldFilePath = join(dir, pathOld)
+        }
 
-    let newFilePath = "";
-    if (pathNew.includes(sep)) {
-        newFilePath = pathNew;
-    } else {
-        newFilePath = join(dir, pathNew)
-    }
+        let newFilePath = "";
+        if (pathNew.includes(sep)) {
+            newFilePath = pathNew;
+        } else {
+            newFilePath = join(dir, pathNew)
+        }
 
-    const readStream = createReadStream(oldFilePath)
-    const writeStream = createWriteStream(newFilePath)
+        const readStream = createReadStream(oldFilePath)
+        const writeStream = createWriteStream(newFilePath)
 
-    try {
-        await pipeline(readStream, writeStream, (err) => {
-            if (err) throw new Error("rename file error")
+        pipeline(readStream, writeStream, async (err) => {
+            if (err) {
+                rej(new Error("rename file error"));
+            } else {
+                await rm(oldFilePath)
+                res();
+                cb();
+            }
         })
-        await rm(oldFilePath)
-        cb()
-    } catch (error) {
-        console.log(error)
-    }
+    })
 };
 
 export default rn;

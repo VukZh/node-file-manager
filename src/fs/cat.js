@@ -5,41 +5,39 @@ import {sep} from "path";
 import {Writable} from "stream";
 const cat = async (path, dir, cb) => {
 
-    let readFilePath = "";
-    if (path.includes(sep)) {
-        readFilePath = path;
-    } else {
-        readFilePath = join(dir, path)
-    }
-
-    let capturedData = '';
-
-    const readStream = createReadStream(readFilePath, { encoding: 'utf8' });
-
-    const writableStream = new Writable({
-        write(chunk, encoding, callback) {
-            capturedData += chunk;
-            callback();
+    return new Promise((res, rej) => {
+        let readFilePath = "";
+        if (path.includes(sep)) {
+            readFilePath = path;
+        } else {
+            readFilePath = join(dir, path)
         }
-    });
 
-    try {
-        await pipeline(
+        let capturedData = '';
+
+        const readStream = createReadStream(readFilePath, {encoding: 'utf8'});
+
+        const writableStream = new Writable({
+            write(chunk, encoding, callback) {
+                capturedData += chunk;
+                callback();
+            }
+        });
+
+        pipeline(
             readStream,
             writableStream,
             (err) => {
                 if (err) {
-                    throw new Error("read file error")
+                    rej(new Error("read file error"));
                 } else {
                     console.log(capturedData);
+                    res();
                     cb();
                 }
             }
         );
-    } catch (error) {
-        console.log(error)
-    }
-
+    })
 };
 
 export default cat;

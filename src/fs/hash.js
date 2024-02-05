@@ -6,29 +6,29 @@ import {sep} from "path";
 
 const calculateHash = async (path, dir, cb) => {
 
-    let encodedFile = "";
-    if (path.includes(sep)) {
-        encodedFile = path;
-    } else {
-        encodedFile = join(dir, path)
-    }
+    return new Promise((res, rej) => {
+        let encodedFile = "";
+        if (path.includes(sep)) {
+            encodedFile = path;
+        } else {
+            encodedFile = join(dir, path)
+        }
 
-    const readStream = createReadStream(encodedFile)
-    const encodedStream = createHash("sha256")
-    encodedStream.setEncoding('hex')
+        const readStream = createReadStream(encodedFile)
+        const encodedStream = createHash("sha256")
+        encodedStream.setEncoding('hex')
 
-    try {
-        await pipeline(readStream, encodedStream, (err) => {
+        pipeline(readStream, encodedStream, (err) => {
             if (err) {
-                throw new Error("calculateHash error")
+                rej(new Error("calculateHash error"));
+            } else {
+                const hashResult = encodedStream.read();
+                console.log(hashResult);
+                res();
+                cb();
             }
-            const hashResult = encodedStream.read();
-            console.log(hashResult);
-            cb();
         })
-    } catch (error) {
-        console.log(error)
-    }
+    })
 };
 
 export default calculateHash;

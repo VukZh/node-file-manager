@@ -15,7 +15,7 @@ const del = async (path, dir, cb) => {
         await rm(delFilePath)
         cb()
     } catch (error) {
-        throw new Error("delete error")
+        throw new Error("delete file error")
     }
 };
 

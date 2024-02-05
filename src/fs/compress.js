@@ -3,31 +3,33 @@ import {createReadStream, createWriteStream} from "fs"
 import {pipeline} from "stream"
 import zlib from "zlib"
 
-const decompress = async (path, dir, newDir, cb) => {
+const compress = async (path, dir, newDir, cb) => {
+    return new Promise((res, rej) => {
+        let oldFilePath = "";
+        if (path.includes(sep)) {
+            oldFilePath = path;
+        } else {
+            oldFilePath = join(dir, path)
+        }
 
-    let oldFilePath = "";
-    if (path.includes(sep)) {
-        oldFilePath = path;
-    } else {
-        oldFilePath = join(dir, path)
-    }
+        const nameParse = oldFilePath.split(sep);
+        const name = nameParse[nameParse.length - 1] + ".br";
+        const newFilePath = join(newDir, name)
 
-    const nameParse = oldFilePath.split(sep);
-    const name = nameParse[nameParse.length - 1] + ".br";
-    const newFilePath = join(newDir, name)
+        const readStream = createReadStream(oldFilePath)
+        const writeStream = createWriteStream(newFilePath)
+        const compressStream = zlib.BrotliCompress();
 
-    const readStream = createReadStream(oldFilePath)
-    const writeStream = createWriteStream(newFilePath)
-    const compressStream = zlib.BrotliCompress();
-
-    try {
-        await pipeline(readStream, compressStream, writeStream, (err) => {
-            if (err) throw new Error("compress error")
+        pipeline(readStream, compressStream, writeStream, (err) => {
+            if (err) {
+                rej(new Error("compress file error"));
+            } else {
+                res();
+                cb();
+            }
         })
-        cb()
-    } catch (error) {
-        console.log(error)
-    }
+    })
+
 };
 
-export default decompress;
+export default compress;
