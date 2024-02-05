@@ -8,10 +8,16 @@ const list = async (path) => {
         const dirItems = await readdir(currentDir);
         const itemsPaths = dirItems.map(item => join(currentDir, item));
         const isFileArrayPromises = itemsPaths.map(async (item) => {
-            const statItem = await stat(item);
-            return statItem.isFile();
+            let statItem;
+            try {
+                statItem = await stat(item, {hidden: true, includeHidden: true});
+            } catch (e) {
+            }
+            return statItem?.isFile();
         })
+
         const isFileArray = await Promise.all(isFileArrayPromises);
+
         const dirItemsWithFlag = dirItems.map((item, ind) => ({
             Name: item,
             Type: isFileArray[ind] ? "File" : "Dir"

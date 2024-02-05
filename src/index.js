@@ -80,7 +80,7 @@ rl.on('line', async (commandTxt) => {
         await hash(commandTxt.split(' ')[1], currentDir, () => currentDirPrint(currentDir));
     }
     if (commandTxt.startsWith("cd ")) {
-        currentDir = cd(commandTxt.slice(2).trim(), currentDir);
+        currentDir = await cd(commandTxt.slice(2).trim(), currentDir);
         currentDirPrint(currentDir);
     }
     if (commandTxt.startsWith("cat ")) {

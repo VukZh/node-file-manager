@@ -1,6 +1,7 @@
 import {join, sep, dirname} from "path";
+import {access} from "fs/promises";
 
-const cd = (path, dir) => {
+const cd = async (path, dir) => {
     let nextPath = "";
     if (path === "..") {
         nextPath = dirname(dir);
@@ -9,7 +10,16 @@ const cd = (path, dir) => {
     } else {
         nextPath = join(dir, path)
     }
-    return nextPath.endsWith(sep) ? nextPath : nextPath + sep;
+    const nextDir = nextPath.endsWith(sep) ? nextPath : nextPath + sep;
+    try {
+        const r = await access(nextDir);
+    } catch (err) {
+        if (err.code === "ENOENT") {
+            throw new Error("Operation failed")
+        }
+        return dir
+    }
+    return nextDir
 };
 
 export default cd;
